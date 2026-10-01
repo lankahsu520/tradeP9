@@ -298,9 +298,9 @@ $ ./esunp9_123.py
 $ make fubonp9_123
 # or
 $ ./fubonp9_123.py
-[9877/9877] pythonP9.py|argsX_dump:0057 - {'securities_firm': 'Fubon', 'config_ini': '/work/certs/fubon/config.ini', 'verbose': True, 'test_only': False, 'intact_json': False}
-[9877/9884] fubon9.py|on_event:0950 - (code: 100, content: connected)
-[9877/9884] fubon9.py|on_event:0950 - (code: 200, content: logged in)
+[12585/12585] pythonP9.py|argsX_dump:0057 - {'securities_firm': 'Fubon', 'config_ini': '/work/certs/fubon/config.ini', 'verbose': True, 'test_only': False, 'intact_json': False}
+[12585/12591] fubonp9.py|on_event:0950 - (code: 100, content: connected)
+[12585/12591] fubonp9.py|on_event:0950 - (code: 200, content: logged in)
 
 --------------- Fubon 主選單 ---------------
   [1] 庫存明細,
@@ -310,7 +310,7 @@ $ ./fubonp9_123.py
   [i] 資料切換 (Partial),
   [l] logout
 請輸入編號 [1]~[8], [q] 離開：8
-[9877/9877] fubon9.py|tradex_q_tradelimit:0727 - (tradelimit: 未提供相關 API !!!)
+[12585/12585] fubonp9.py|tradex_q_tradelimit:0727 - (tradelimit: 未提供相關 API !!!)
 
 --------------- Fubon 主選單 ---------------
   [1] 庫存明細,
@@ -320,8 +320,8 @@ $ ./fubonp9_123.py
   [i] 資料切換 (Partial),
   [l] logout
 請輸入編號 [1]~[8], [q] 離開：q
-[9877/9885] fubon9.py|threadx_handler:0929 - Bye-Bye !!!
-[9877/9877] fubonp9_123.py|main:0378 - Bye-Bye !!! (app_quit_get: 1)
+[12585/12592] fubonp9.py|threadx_handler:0929 - Bye-Bye !!!
+[12585/12585] fubonp9_123.py|main:0378 - Bye-Bye !!! (app_quit_get: 1)
 ```
 
 # 6. Documentation
