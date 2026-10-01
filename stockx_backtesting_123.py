@@ -20,7 +20,7 @@
 #import os, sys, errno, getopt, signal, time, io
 #from time import sleep
 
-from stockx_backtesting_api import *
+from tradeP9.stockx_backtesting_api import *
 
 stock_no = '0050'           # 股票代碼
 

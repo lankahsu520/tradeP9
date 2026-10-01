@@ -15,12 +15,6 @@
  *
  ***************************************************************************
 """
-
-#import os, sys, errno, getopt, signal, time, io
-#from time import sleep
-from pythonX9 import *
-from threadx_api import *
-
 import pandas as pd
 import numpy
 import requests, json
@@ -35,6 +29,11 @@ from calendar import monthrange
 import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
+
+#import os, sys, errno, getopt, signal, time, io
+#from time import sleep
+from pythonX9.pythonX9 import *
+from pythonX9.threadx_api import *
 
 stock_splits = [ ("0050", pd.Timestamp("2025-06-18"), 1/4) ]
 

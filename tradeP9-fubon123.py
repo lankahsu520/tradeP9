@@ -20,14 +20,14 @@
 #import os, sys, errno, getopt, signal, time, io
 #from time import sleep
 
-from tradeX9_esun_api import *
+from tradeP9.tradeP9_fubon_api import *
 
 appX_list = []
 is_quit = 0
 is_release = 0
 argsX = {
-	"securities_firm": 'ESun'
-	,"config_ini": '/work/certs/esun/config.ini'
+	"securities_firm": 'Fubon'
+	,"config_ini": '/work/certs/fubon/config.ini'
 	,"verbose": True
 	,"test_only": False
 	,"intact_json":False
@@ -283,7 +283,7 @@ def app_demo(tradex_mgr):
 def app_start():
 	argsX_dump(argsX)
 
-	tradex_mgr = tradeX9_esun_ctx(dbg_lvl=DBG_LVL_INFO)
+	tradex_mgr = tradeP9_fubon_ctx(dbg_lvl=DBG_LVL_INFO)
 	tradex_mgr.start(argsX)
 
 	app_watch(tradex_mgr)
@@ -307,7 +307,7 @@ def app_release():
 			try:
 				objname = DBG_NAME(x)
 				if not x.release is None:
-					DBG_DB_LN(f"call {objname}.release ...")
+					DBG_DB_LN(f"call {objname}.release ..." )
 					x.release() # No handlers could be found for logger "google.api_core.bidi"
 			except Exception:
 				pass

@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tradeP9"
+version = "1.0.0"
+description = "tradeP9 提供台灣證券的相關操作和分析。"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "pythonX9 @ git+https://github.com/lankahsu520/pythonX9.git",
+]
+
+[tool.setuptools]
+py-modules = [
+    "tradeX9_esun_api",
+    "tradeX9_fubon_api",
+    "stockx_backtesting_api",
+]

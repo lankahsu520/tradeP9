@@ -253,14 +253,14 @@ Day 1-Year                  3-Year                  5-Year                  Sum
 
 > 這是官方的交易範例
 
-## - tradeX9-esun123.py - 玉山證劵交易範例
+## - tradeP9-esun123.py - 玉山證劵交易範例
 
 > -t : 單純測式流程，不會下單 
 
 ```bash
-$ make tradeX9-esun123.py
+$ make tradeP9-esun123.py
 or
-$ ./tradeX9-esun123.py
+$ ./tradeP9-esun123.py
 [9870/9870] pythonX9.py|argsX_dump:0057 - {'securities_firm': 'ESun', 'config_ini': '/work/certs/esun/config.ini', 'verbose': True, 'test_only': False, 'intact_json': False}
 
 --------------- ESun 主選單 ---------------
@@ -271,7 +271,7 @@ $ ./tradeX9-esun123.py
   [i] 資料切換 (Partial),
   [l] logout
 請輸入編號 [1]~[8], [q] 離開：8
-[9870/9870] tradeX9_esun_api.py|tradex_q_tradelimit:0695 - {"trade_limit": 1000000, "margin_limit": 0, "short_limit": 0, "day_trade_code": "X", "margin_code": "9", "short_code": "9"}
+[9870/9870] tradeP9_esun_api.py|tradex_q_tradelimit:0695 - {"trade_limit": 1000000, "margin_limit": 0, "short_limit": 0, "day_trade_code": "X", "margin_code": "9", "short_code": "9"}
 
 --------------- ESun 主選單 ---------------
   [1] 庫存明細,
@@ -281,9 +281,9 @@ $ ./tradeX9-esun123.py
   [i] 資料切換 (Partial),
   [l] logout
 請輸入編號 [1]~[8], [q] 離開：q
-[9870/9871] tradeX9_esun_api.py|on_close:0848 - (close_status_code: None, close_msg: None)
-[9870/9871] tradeX9_esun_api.py|threadx_handler:0870 - Bye-Bye !!!
-[9870/9870] tradeX9-esun123.py|main:0378 - Bye-Bye !!! (app_quit_get: 1)
+[9870/9871] tradeP9_esun_api.py|on_close:0848 - (close_status_code: None, close_msg: None)
+[9870/9871] tradeP9_esun_api.py|threadx_handler:0870 - Bye-Bye !!!
+[9870/9870] tradeP9-esun123.py|main:0378 - Bye-Bye !!! (app_quit_get: 1)
 ```
 
 ## - tradex-fubon123.py - 富邦證劵交易範例
@@ -293,8 +293,8 @@ $ ./tradeX9-esun123.py
 ```bash
 $ ./tradex-fubon123.py
 [9877/9877] pythonX9.py|argsX_dump:0057 - {'securities_firm': 'Fubon', 'config_ini': '/work/certs/fubon/config.ini', 'verbose': True, 'test_only': False, 'intact_json': False}
-[9877/9884] tradeX9_fubon_api.py|on_event:0950 - (code: 100, content: connected)
-[9877/9884] tradeX9_fubon_api.py|on_event:0950 - (code: 200, content: logged in)
+[9877/9884] tradeP9_fubon_api.py|on_event:0950 - (code: 100, content: connected)
+[9877/9884] tradeP9_fubon_api.py|on_event:0950 - (code: 200, content: logged in)
 
 --------------- Fubon 主選單 ---------------
   [1] 庫存明細,
@@ -304,7 +304,7 @@ $ ./tradex-fubon123.py
   [i] 資料切換 (Partial),
   [l] logout
 請輸入編號 [1]~[8], [q] 離開：8
-[9877/9877] tradeX9_fubon_api.py|tradex_q_tradelimit:0727 - (tradelimit: 未提供相關 API !!!)
+[9877/9877] tradeP9_fubon_api.py|tradex_q_tradelimit:0727 - (tradelimit: 未提供相關 API !!!)
 
 --------------- Fubon 主選單 ---------------
   [1] 庫存明細,
@@ -314,8 +314,8 @@ $ ./tradex-fubon123.py
   [i] 資料切換 (Partial),
   [l] logout
 請輸入編號 [1]~[8], [q] 離開：q
-[9877/9885] tradeX9_fubon_api.py|threadx_handler:0929 - Bye-Bye !!!
-[9877/9877] tradeX9-fubon123.py|main:0378 - Bye-Bye !!! (app_quit_get: 1)
+[9877/9885] tradeP9_fubon_api.py|threadx_handler:0929 - Bye-Bye !!!
+[9877/9877] tradeP9-fubon123.py|main:0378 - Bye-Bye !!! (app_quit_get: 1)
 ```
 
 # 6. Documentation
@@ -848,5 +848,5 @@ $ rm -f ~/.local/share/python_keyring/keyring_pass.cfg
 
 # License
 
-> [tradeX9](https://github.com/lankahsu520/tradeX9) is under the New BSD License (BSD-3-Clause).
+> [tradeP9](https://github.com/lankahsu520/tradeP9) is under the New BSD License (BSD-3-Clause).
 

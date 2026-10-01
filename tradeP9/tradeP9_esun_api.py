@@ -17,90 +17,72 @@
 """
 
 	#**************************************************
-	# 富邦SDK
+	# 玉山SDK
 	#**************************************************
 from configparser import ConfigParser
-
-from getpass import getpass
-from keyring import get_password, set_password, set_keyring, delete_password
-from keyrings.cryptfile.cryptfile import CryptFileKeyring
-from hashlib import md5
-
-from fubon_neo.sdk import FubonSDK, Order as OrderObject
-from fubon_neo.constant import TimeInForce, OrderType, PriceType, MarketType, BSAction
+from esun_trade.sdk import SDK as EsunSDK
+from esun_trade.order import OrderObject
+from esun_trade.constant import (APCode, Trade, PriceFlag, BSFlag, Action)
 
 from datetime import date, timedelta
-from dateutil.relativedelta import relativedelta
 
 #import os, sys, errno, getopt, signal, time, io
 #from time import sleep
-from pythonX9 import *
-from threadx_api import *
+from pythonX9.pythonX9 import *
+from pythonX9.threadx_api import *
 
-TRADE_SDK_ACCOUNT_KEY = "fubon_trade_sdk:account"
-TRADE_SDK_CERT_KEY = "fubon_trade_sdk:cert"
+class tradeP9_esun_ctx(pythonX9, threadx_ctx):
+	QUANTITY_LOTS_UNIT = 1
 
-class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
-	QUANTITY_LOTS_UNIT = 1000
+	ACTION_BUY = Action.Buy
+	ACTION_SELL = Action.Sell
 
-	ACTION_BUY = BSAction.Buy
-	ACTION_SELL = BSAction.Sell
+	MARKETTYPE_COMMON = APCode.Common
+	MARKETTYPE_AFTERMARKET = APCode.AfterMarket
+	MARKETTYPE_INTRADAYODD = APCode.IntradayOdd
+	MARKETTYPE_ODD = APCode.Odd
 
-	MARKETTYPE_COMMON = MarketType.Common
-	MARKETTYPE_AFTERMARKET = MarketType.Fixing
-	MARKETTYPE_INTRADAYODD = MarketType.IntradayOdd
-	MARKETTYPE_ODD = MarketType.Odd
+	PRICEFLAG_LIMIT = PriceFlag.Limit
+	PRICEFLAG_FLAT = PriceFlag.Flat
+	PRICEFLAG_LIMITDOWN = PriceFlag.LimitDown
+	PRICEFLAG_LIMITUP = PriceFlag.LimitUp
+	PRICEFLAG_MARKET = PriceFlag.Market
 
-	PRICEFLAG_LIMIT = PriceType.Limit
-	PRICEFLAG_FLAT = PriceType.Reference
-	PRICEFLAG_LIMITDOWN = PriceType.LimitDown
-	PRICEFLAG_LIMITUP = PriceType.LimitUp
-	PRICEFLAG_MARKET = PriceType.Market
+	BSFLAG_ROD = BSFlag.ROD
+	BSFLAG_FOK = BSFlag.FOK
+	BSFLAG_IOC = BSFlag.IOC
 
-	BSFLAG_ROD = TimeInForce.ROD
-	BSFLAG_FOK = TimeInForce.FOK
-	BSFLAG_IOC = TimeInForce.IOC
+	TRADE_CASH = Trade.Cash
+	TRADE_MARGIN = Trade.Margin
+	TRADE_SHORT = Trade.Short
+	TRADE_DAYTRADINGSELL = Trade.DayTradingSell
+	#TRADE_SBL =
 
-	TRADE_CASH = OrderType.Stock
-	TRADE_MARGIN = OrderType.Margin
-	TRADE_SHORT = OrderType.Short
-	TRADE_DAYTRADINGSELL = OrderType.DayTrade
-	TRADE_SBL = OrderType.SBL
-
-	DATE_HYPHEN = 1
+	DATE_HYPHEN = 0
 
 	#**************************************************
 	# Field Value
 	#**************************************************
 	# 可取消狀態
 	def tradex_field_celable(self, item):
-		match item.status:
-			case 0: # 預約單
-				celable = f"yes" if item.after_qty > 0 else f"no"
-			case 10: # 委託成功
-				celable = f"yes" if item.after_qty > 0 else f"no"
-			case 30: # 未成交刪單成功
-				celable = f"no"
-			case 40: # 部分成交，剩餘取消
-				celable = f"no"
-			case 90: # 失敗
-				celable = f"no"
-			case _:
-				celable = f"no"
+		if item['celable'] == "1":
+			celable = f"yes"
+		else:
+			celable = f"no"
 		return celable
 
 	# 委託書編號
 	def tradex_field_ord_no(self, item):
-		if item.order_no is not None:
-			ord_no = f"{item.order_no}"
+		if item['ord_no'] != "":
+			ord_no = f"{item['ord_no']}"
 		else:
-			ord_no = f"{item.seq_no}"
+			ord_no = f"{item['pre_ord_no']}"
 		return ord_no
 
 	# 預約狀態
 	def tradex_field_pre_order(self, item):
-		if hasattr(item, 'is_pre_order'):
-			if item.is_pre_order == True:
+		if 'ord_status' in item:
+			if item['ord_status'] == "1":
 				return f"預約單"
 			else:
 				return f"盤中單"
@@ -109,18 +91,23 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 
 	# 股票代號
 	def tradex_field_stk_no(self, item):
-		return f"{item.stock_no}"
+		if 'stock_no' in item:
+			return f"{item['stock_no']}"
+		elif 'stk_no' in item:
+			return f"{item['stk_no']}"
+		else:
+			return f"xxx"
 
 	# 股票名稱
 	def tradex_field_stk_name(self, item):
-		if hasattr(item, 'stk_na'):
-			return f"{item.stk_na}"
+		if 'stk_na' in item:
+			return f"{item['stk_na']}"
 		else:
 			return f"xxx"
 
 	# 買賣別
 	def tradex_field_buy_sell(self, item):
-		if item.buy_sell == self.ACTION_BUY:
+		if item['buy_sell'] == "B":
 			buy_sell = "買"
 		else:
 			buy_sell = "賣"
@@ -128,108 +115,125 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 
 		# 原始委託數量
 	def tradex_field_quantity(self, item):
-		if hasattr(item, 'quantity'):
-			return f"{item.quantity:,}"
+		if 'org_qty_share' in item:
+			return f"{item['org_qty_share']:,}"
 		else:
 			return f"xxx"
 
 	# 交割日
 	def tradex_field_s_date(self, item):
-		if hasattr(item, 'settlement_date'):
-			return f"{item.settlement_date}"
+		if 'date' in item:
+			return f"{item['date']}"
 		else:
 			return f"xxx"
 
 	# 成交日
 	def tradex_field_o_date(self, item):
-		if hasattr(item, 'date'):
-			return f"{item.date}"
+		if 'c_date' in item:
+			return f"{item['date']}"
 		else:
 			return f"xxx"
 
 	# 日期
 	def tradex_field_c_date(self, item):
-		if hasattr(item, 'date'):
-			return f"{item.date}"
+		if 'c_date' in item:
+			return f"{item['c_date']}"
+		elif 'work_date' in item:
+			return f"{item['work_date']}"
+		elif 'ack_date' in item:
+			return f"{item['ack_date']}"
 		else:
 			return f"xxx"
 
 	# 已成交數量
 	def tradex_field_mat_qty(self, item):
-		if hasattr(item, 'filled_qty'):
-			return f"{item.filled_qty:,}" if item.filled_qty is not None else "0"
+		if 'mat_qty_share' in item:
+			return f"{int(item['mat_qty_share']):,}"
+		elif 'qty' in item:
+			return f"{int(item['qty']):,}"
 		else:
 			return f"xxx"
 
 	# 取消數量
 	def tradex_field_cel_qty(self, item):
-		if hasattr(item, 'quantity') and hasattr(item, 'after_qty'):
-			return f"{item.quantity - item.after_qty:,}"
+		if 'cel_qty_share' in item:
+			return f"{int(item['cel_qty_share']):,}"
 		else:
 			return f"xxx"
 
 	# 昨餘額股數
 	def tradex_field_qty_l(self, item):
-		if hasattr(item, 'lastday_qty') and hasattr(item, 'odd') and hasattr(item.odd, 'lastday_qty'):
-			return f"{item.lastday_qty + item.odd.lastday_qty:,}"
+		if 'qty_l' in item:
+			return f"{int(item['qty_l']):,}"
 		else:
 			return f"xxx"
 
 	# 委買成交股數
 	def tradex_field_qty_bm(self, item):
-		if hasattr(item, 'buy_filled_qty') and hasattr(item, 'odd') and hasattr(item.odd, 'buy_filled_qty'):
-			return f"{item.buy_filled_qty + item.odd.buy_filled_qty:,}"
+		if 'qty_bm' in item:
+			return f"{int(item['qty_bm']):,}"
 		else:
 			return f"xxx"
 
 	# 賣成交股數
 	def tradex_field_qty_sm(self, item):
-		if hasattr(item, 'sell_filled_qty') and hasattr(item, 'odd') and hasattr(item.odd, 'sell_filled_qty'):
-			return f"{item.sell_filled_qty + item.odd.sell_filled_qty:,}"
+		if 'qty_sm' in item:
+			return f"{int(item['qty_sm']):,}"
 		else:
 			return f"xxx"
 
 	# 委託價格
 	def tradex_field_od_price(self, item):
-		if hasattr(item, 'price'):
-			return f"{item.price:,}"
+		if 'od_price' in item:
+			return f"{float(item['od_price']):,}"
 		else:
 			return f"xxx"
 
 	# 成交均價
 	def tradex_field_avg_price(self, item):
-		if hasattr(item, 'price_avg'):
-			return f"{item.price_avg:,}"
-		elif hasattr(item, 'filled_avg_price'):
-			return f"{item.filled_avg_price:,}"
+		if 'avg_price' in item:
+			return f"{item['avg_price']:,}"
+		elif 'price_avg' in item:
+			return f"{float(item['price_avg']):,}"
 		else:
 			return f"xxx"
 
 	# 即時價格
 	def tradex_field_price_now(self, item):
-		if hasattr(item, 'price_now'):
-			return f"{item.price_now:,}"
+		if 'price_now' in item:
+			return f"{float(item['price_now']):,}"
 		else:
 			return f"xxx"
 
 	# 交割款
 	def tradex_field_settlement_price(self, item):
-		if hasattr(item, 'total_settlement_amount'):
-			return f"{item.total_settlement_amount:,}" if item.total_settlement_amount is not None else "None"
+		if 'price' in item:
+			return f"{float(item['price']):,}"
 		else:
 			return f"xxx"
 
 	# 市場別
 	def tradex_field_s_type(self, item):
-		if hasattr(item, 's_type'):
-			return f"{item.s_type}"
+		if 's_type' in item:
+			match item['s_type']:
+				case 'H':
+					return f"上市"
+
+				case 'O':
+					return f"上櫃"
+
+				case 'R':
+					return f"興櫃"
+
+				case _:
+					return f"上市"
 		else:
 			return f"ｘｘｘ"
 
 	# 錯誤碼
 	def tradex_field_err_code(self, item):
-		if hasattr(item, 'status'):
-			return f"{item.status}"
+		if 'err_code' in item:
+			return f"{item['err_code']}"
 		else:
 			return f"xxx"
 
@@ -238,7 +242,7 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 	# 交易下單
 	#**************************************************
 	def tradex_orders_get(self):
-		return self.orders.data
+		return self.orders
 
 	# 委託紀錄
 	def tradex_q_orders(self):
@@ -283,13 +287,12 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 			msg += "\n\n]"
 			return msg
 
-		self.orders = self.trade_sdk.stock.get_order_results(self.__account)
+		self.orders = self.trade_sdk.get_order_results()
 		if ( self.verbose == True ):
 			if ( self.intact_json == True ):
-				DBG_IF_LN(f"(orders: {self.orders})")
+				JSON_IF_FORMAT(self.orders, jstyle=JSTYLE.ARRAY)
 			else:
-				msg = orders_filter_cb( self.orders.data )
-				DBG_IF_LN(f"(orders: {msg})")
+				JSON_IF_FORMAT(self.orders, jstyle=JSTYLE.ARRAY, filter_cb=orders_filter_cb)
 
 		return self.orders
 
@@ -349,13 +352,12 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 			start_date_str = start_date_str.replace("-", "")
 			end_date_str = end_date_str.replace("-", "")
 
-		self.orders_history = self.trade_sdk.stock.order_history(self.__account, start_date_str, end_date_str)
+		self.orders_history = self.trade_sdk.get_order_results_by_date(start_date_str, end_date_str)
 		if ( self.verbose == True ):
 			if ( self.intact_json == True ):
-				DBG_IF_LN(f"(orders_history: {self.orders_history})")
+				JSON_IF_FORMAT(self.orders_history)
 			else:
-				msg = orders_filter_cb(self.orders_history.data)
-				DBG_IF_LN(f"(orders_history: {msg})")
+				JSON_IF_FORMAT(self.orders_history, jstyle=JSTYLE.ARRAY, filter_cb=orders_filter_cb)
 
 		return self.orders_history
 
@@ -388,45 +390,18 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 			msg += "\n\n]"
 			return msg
 
-		start_date = date.today()
-		start_date_str = start_date.strftime("%Y%m%d")
-		match query_range:
-			case '3m':
-				end_date = date.today()
-				start_date = end_date - relativedelta(months=3)
-
-			case '1m':
-				end_date = date.today()
-				start_date = end_date - relativedelta(months=1)
-
-			case '3d':
-				end_date = date.today()
-				start_date = end_date - timedelta(days=3)
-
-			case '0d':
-				start_date = date.today()
-				end_date = start_date
-
-			case _:
-				start_date = date.today()
-				end_date = start_date
-
-		start_date_str = start_date.strftime("%Y-%m-%d")
-		end_date_str = end_date.strftime("%Y-%m-%d")
-
-		DBG_IF_LN(f"( {start_date_str} ~ {end_date_str} )")
+		DBG_IF_LN(f"(query_range: {query_range})")
 
 		if ( self.DATE_HYPHEN == 1):
 			start_date_str = start_date_str.replace("-", "")
 			end_date_str = end_date_str.replace("-", "")
 
-		self.transactions = self.trade_sdk.stock.filled_history(self.__account, start_date_str, end_date_str)
+		self.transactions = self.trade_sdk.get_transactions(query_range)
 		if ( self.verbose == True ):
 			if ( self.intact_json == True ):
-				DBG_IF_LN(f"(transactions: {self.transactions})")
+				JSON_IF_FORMAT(self.transactions, jstyle=JSTYLE.ARRAY)
 			else:
-				msg = transactions_filter_cb(self.transactions.data)
-				DBG_IF_LN(f"(transactions: {msg})")
+				JSON_IF_FORMAT(self.transactions, jstyle=JSTYLE.ARRAY, filter_cb=transactions_filter_cb)
 
 		return self.transactions
 
@@ -472,13 +447,12 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 			start_date_str = start_date_str.replace("-", "")
 			end_date_str = end_date_str.replace("-", "")
 
-		self.transactions_history = self.trade_sdk.stock.filled_history(self.__account, start_date_str, end_date_str)
+		self.transactions_history = self.trade_sdk.get_transactions_by_date(start_date_str, end_date_str)
 		if ( self.verbose == True ):
 			if ( self.intact_json == True ):
-				DBG_IF_LN(f"(transactions_history: {self.transactions_history})")
+				JSON_IF_FORMAT(self.transactions_history, jstyle=JSTYLE.ARRAY)
 			else:
-				msg = transactions_history_filter_cb(self.transactions_history.data)
-				DBG_IF_LN(f"(transactions_history: {msg})")
+				JSON_IF_FORMAT(self.transactions_history, jstyle=JSTYLE.ARRAY, filter_cb=transactions_history_filter_cb)
 
 		return self.transactions_history
 
@@ -490,8 +464,7 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 			#DBG_DB_LN(DBG_TXT_ENTER)
 			msg = "[\n\n"
 			msg += f"{'idx':>3} - {'交易日期':<8} {'交割日期':<8} {'交割款':<7}\n"
-			i = 0
-			for item in datas:
+			for i, item in enumerate(datas):
 				comma = "\n" if i < len(datas) - 1 else ""
 
 				o_date_str = self.tradex_field_o_date(item)
@@ -501,18 +474,15 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 				settlement_price_str = self.tradex_field_settlement_price(item)
 
 				msg += f"{i:>3} - {o_date_str:<12} {s_date_str:<12} {settlement_price_str:<10}{comma}"
-				i+=1
 			msg += "\n\n]"
 			return msg
 
-		self.settlements = self.trade_sdk.accounting.query_settlement(self.__account,range)
+		self.settlements = self.trade_sdk.get_settlements()
 		if ( self.verbose == True ):
-			if ( self.intact_json == True ):
-				DBG_IF_LN(f"(settlements: {self.settlements})")
+			if ( self.verbose == True ):
+				JSON_IF_FORMAT(self.settlements, jstyle=JSTYLE.ARRAY, filter_cb=settlements_filter_cb)
 			else:
-				details = self.settlements.data.details
-				msg = settlements_filter_cb(details)
-				DBG_IF_LN(f"(settlements: {msg})")
+				JSON_IF_FORMAT(self.settlements)
 
 		return self.settlements
 
@@ -521,7 +491,7 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 		DBG_TR_LN(DBG_TXT_ENTER)
 
 		if ( self.verbose == True ) and ( self.last_delete_response is not None ):
-			DBG_IF_LN(f"(last_delete_response: {self.last_delete_response})")
+			JSON_IF_FORMAT(self.last_delete_response)
 
 		return self.last_delete_response
 
@@ -530,8 +500,7 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 		DBG_TR_LN(DBG_TXT_ENTER)
 
 		if ( self.test_only == False ):
-			modify_qty_obj = self.trade_sdk.stock.make_modify_quantity_obj(order_result, 1000)
-			self.last_delete_response = self.trade_sdk.stock.cancel_order(self.__account, modify_qty_obj)
+			self.last_delete_response = self.trade_sdk.cancel_order(order_result, qty_share)
 		else:
 			DBG_WN_LN("測試模式，未執行交易 !")
 
@@ -542,7 +511,7 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 		DBG_TR_LN(DBG_TXT_ENTER)
 
 		if ( self.test_only == False ):
-			self.last_delete_response = self.trade_sdk.stock.cancel_order(self.__account, order_result)
+			self.last_delete_response = self.trade_sdk.cancel_order(order_result)
 		else:
 			DBG_WN_LN("測試模式，未執行交易 !")
 
@@ -553,59 +522,58 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 		DBG_TR_LN(DBG_TXT_ENTER)
 
 		if ( self.verbose == True ) and ( self.last_order_response is not None ):
-			DBG_IF_LN(f"(last_order_response: {self.last_order_response})")
+			JSON_IF_FORMAT(self.last_order_response)
 
 		return self.last_order_response
 
-	#BSAction
+	#Action
 	#  Buy	"B"	買
 	#  Sell	"S"	賣
-	#MarketType
-	#  Common	"?"	整股, 千股, 1000 ~ 499000
-	#  Fixing	"?"	盤後定價, 千股, 1000 ~ 499000
-	#  Odd	"?"	盤後零股, 股, 1 ~ 999
-	#  Emg	"?"	興櫃, 千股, 1000 ~ 499000 (超過 1000 後，最小升降單位為 1000)
-	#  IntradayOdd	"?"	盤中零股, 股, 1 ~ 999
-	#  EmgOdd	"?"	興櫃零股, 股, 1 ~ 999
-	# PriceType
-	#  Limit	"?"	限價
-	#  LimitUp	"?"	漲停
-	#  LimitDown	"?"	跌停
-	#  Market	"?"	市價
-	#  Reference	"?"	參考價 (定盤時為定盤價)
-	# TimeInForce
-	#  ROD	"?"	當日有效(Rest of Day)
-	#  FOK	"?"	全部成交否則取消(Fill-or-Kill)
-	#  IOC	"?"	立即成交否則取消(Immediate-or-Cancel)
-	# OrderType
-	#  Stock	"?"	現股
-	#  Margin	"?"	融資
-	#  Short	"?"	融券
-	#  DayTrade	"?"	現沖先賣
-	#  SBL	"?"	借券
+	#APCode
+	#  Common	"1"	整股, 張, 1 ~ 499
+	#  AfterMarket	"2"	盤後定價, 張, 1 ~ 499
+	#  Odd	"3"	盤後零股, 股, 1 ~ 999
+	#  Emg	"4"	興櫃, 股, 1 ~ 999, 1000 ~ 499000 (超過 1000 後，最小升降單位為 1000)
+	#  IntradayOdd	"5"	盤中零股, 股, 1 ~ 999
+	# PriceFlag
+	#  Limit	"0"	限價
+	#  Flat	"1"	平盤
+	#  LimitDown	"2"	跌停
+	#  LimitUp	"3"	漲停
+	#  Market	"4"	市價
+	# BSFlag
+	#  ROD	"R"	當日委託有效單
+	#  FOK	"F"	立即全部成交否則取消
+	#  IOC	"I"	立即成交否則取消
+	# Trade
+	#  Cash	"0"	現股
+	#  Margin	"3"	融資
+	#  Short	"4"	融券
+	#  DayTrading	"9"	信用當沖（僅適用於帳務）
+	#  DayTradingSell	"A"	現股當沖賣
 	def tradex_o_helper(self, stock_no=None, price=None, quantity=0, buy_sell=ACTION_BUY, ap_code=MARKETTYPE_COMMON):
 		DBG_TR_LN(DBG_TXT_ENTER)
 
 		if ( self.__is_login == True ) and ( stock_no is not None ):
 			order_args = {
-				"symbol": stock_no,
+				"stock_no": stock_no,
 				"quantity": quantity,
 				"buy_sell": buy_sell,
-				"market_type": ap_code,
-				"price_type": self.PRICEFLAG_LIMIT,
-				"time_in_force": self.BSFLAG_ROD,
-				"order_type": self.TRADE_CASH,
+				"ap_code": ap_code,
+				"price_flag": self.PRICEFLAG_LIMIT,
+				"bs_flag": self.BSFLAG_ROD,
+				"trade": self.TRADE_CASH,
 			}
 
 			if not price is None:
-				order_args["price"] = f"{price:.2f}"
+				order_args["price"] = price
 
 			DBG_DB_LN(f"(order_args: {order_args})")
 
 			self.last_order = OrderObject(**order_args)
 
 			if ( self.test_only == False ):
-				self.last_order_response = self.trade_sdk.stock.place_order( self.__account, self.last_order )
+				self.last_order_response = self.trade_sdk.place_order( self.last_order )
 			else:
 				DBG_WN_LN("測試模式，未執行交易 !")
 		else:
@@ -722,9 +690,9 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 	def tradex_q_tradelimit(self):
 		DBG_TR_LN(DBG_TXT_ENTER)
 
-		self.tradelimit = f"未提供相關 API !!!"
+		self.tradelimit = self.trade_sdk.get_trade_status()
 		if ( self.verbose == True ):
-			DBG_IF_LN(f"(tradelimit: {self.tradelimit})")
+			JSON_IF_FORMAT(self.tradelimit)
 
 		return self.tradelimit
 
@@ -732,9 +700,9 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 	def tradex_q_balance(self):
 		DBG_TR_LN(DBG_TXT_ENTER)
 
-		self.balance = self.trade_sdk.accounting.bank_remain(self.__account)
+		self.balance = self.trade_sdk.get_balance()
 		if ( self.verbose == True ):
-			DBG_IF_LN(f"(balance: {self.balance})")
+			JSON_IF_FORMAT(self.balance)
 
 		return self.balance
 
@@ -769,13 +737,12 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 			msg += "\n\n]"
 			return msg
 
-		self.inventories = self.trade_sdk.accounting.inventories(self.__account)
+		self.inventories = self.trade_sdk.get_inventories()
 		if ( self.verbose == True ):
 			if ( self.intact_json == True ):
-				DBG_IF_LN(f"(inventories: {self.inventories})")
+				JSON_IF_FORMAT(self.inventories, jstyle=JSTYLE.ARRAY)
 			else:
-				msg = inventories_filter_cb(self.inventories.data)
-				DBG_IF_LN(f"(inventories: {msg})")
+				JSON_IF_FORMAT(self.inventories, jstyle=JSTYLE.ARRAY, filter_cb=inventories_filter_cb)
 
 		return self.inventories
 
@@ -785,23 +752,6 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 	#**************************************************
 	def tradex_config_validate(self, config):
 		DBG_TR_LN(DBG_TXT_ENTER)
-
-		if not ( config.has_section("Cert")
-			and config.has_section("Api")
-			and config.has_section("User") ):
-				raise TypeError("please fill in config file")
-
-		if (not config["Cert"].get("Path")) or config["Cert"]["Path"].find(	".p12") == -1:
-			raise TypeError("please give correct Cert Path")
-		self.__certPath = self.config["Cert"]["Path"]
-
-		#if not config["Api"].get("Secret"):
-		#	raise TypeError("please give correct Api Secret")
-		#self.__APISecret = self.config["Api"]["Secret"]
-
-		if not config["User"].get("Account"):
-			raise TypeError("please give correct User Account")
-		self.__AID = self.config["User"]["Account"]
 
 	# 讀取設定檔
 	def tradex_config(self):
@@ -826,33 +776,11 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 	def tradex_load_credentials(self):
 		DBG_TR_LN(DBG_TXT_ENTER)
 
-		user_account = self.__AID
-
-		# Get existing passwords from keyring
-		account_password = get_password(TRADE_SDK_ACCOUNT_KEY, user_account)
-		cert_password = get_password(TRADE_SDK_CERT_KEY, user_account)
-
-		# Prompt for missing passwords
-		if not account_password:
-			new_password = getpass("Enter account password: ")
-			set_password(TRADE_SDK_ACCOUNT_KEY, user_account, new_password)
-			account_password = new_password
-
-		if not cert_password:
-				new_cert_password = getpass("Enter cert password: ")
-				set_password(TRADE_SDK_CERT_KEY, user_account, new_cert_password)
-				cert_password = new_cert_password
-
-		return {
-				"account_password": account_password,
-				"cert_password": cert_password
-		}
-
 	# 登出
 	def tradex_logout(self):
 		DBG_TR_LN(DBG_TXT_ENTER)
 
-		self.tradex_remove_credentials()
+		#self.tradex_remove_credentials()
 
 		self.trade_sdk.logout()
 
@@ -860,26 +788,15 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 	def tradex_login(self):
 		DBG_TR_LN(DBG_TXT_ENTER)
 
-		# 帳號&密碼 登入
-		self.accounts = self.trade_sdk.login(self.__AID, self.credentials["account_password"], self.__certPath, self.credentials["cert_password"])
-		# API Key 登入
-		#self.accounts = self.trade_sdk.apikey_login(self.__AID, self.__APISecret, self.__certPath, self.credentials["cert_password"])
+		self.trade_sdk.login()
 
-		if self.accounts.is_success == True:
-			self.__is_login = True
-			self.__account = self.accounts.data[0]
-
-			DBG_TR_LN(f"(accounts: {self.accounts}, {type(self.accounts)})")
-		else:
-			DBG_ER_LN("登入失敗 !!!")
+		self.__is_login = True
 
 	# 重設密碼
 	def tradex_password(self):
 		DBG_TR_LN(DBG_TXT_ENTER)
 
-		self.password_response = f"未提供相關 API !!!"
-		if ( self.verbose == True ):
-			DBG_IF_LN(f"(password_response: {self.password_response})")
+		self.trade_sdk.reset_password()
 
 		return self.password_response
 
@@ -887,9 +804,9 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 	def tradex_q_certinfo(self):
 		DBG_TR_LN(DBG_TXT_ENTER)
 
-		self.certinfo = f"未提供相關 API !!!"
+		self.certinfo = self.trade_sdk.certinfo()
 		if ( self.verbose == True ):
-			DBG_IF_LN(f"(certinfo: {self.certinfo})")
+			JSON_IF_FORMAT(self.certinfo)
 
 		return self.certinfo
 
@@ -897,9 +814,9 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 	def tradex_q_keyinfo(self):
 		DBG_TR_LN(DBG_TXT_ENTER)
 
-		self.keyinfo = f"未提供相關 API !!!"
+		self.keyinfo = self.trade_sdk.get_key_info()
 		if ( self.verbose == True ):
-			DBG_IF_LN(f"(keyinfo: {self.keyinfo})")
+			JSON_IF_FORMAT(self.keyinfo)
 
 		return self.keyinfo
 
@@ -910,8 +827,32 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 	def threadx_websocket_open(self):
 		DBG_TR_LN(DBG_TXT_ENTER)
 
+		# 註冊當 websocket 發生錯誤時的 callback
+		@self.trade_sdk.on('error')
+		def on_error(err):
+			DBG_ER_LN(f"{err}")
+
+		# 註冊接收委託回報的 callback
+		@self.trade_sdk.on('order')
+		def on_order(data):
+			DBG_IF_LN(f"{data}")
+
+		# 註冊接收成交回報的 callback
+		@self.trade_sdk.on('dealt')
+		def on_dealt(data):
+			DBG_WN_LN(f"{data}")
+
+		# 註冊關閉回報的 callback
+		@self.trade_sdk.on('close')
+		def on_close(ws, close_status_code, close_msg):
+			DBG_WN_LN(f"(close_status_code: {close_status_code}, close_msg: {close_msg})")
+
+		self.trade_sdk.connect_websocket()
+
 	def threadx_websocket_close(self):
 		DBG_TR_LN(DBG_TXT_ENTER)
+
+		self.trade_sdk.close_websocket()
 
 
 	#**************************************************
@@ -929,30 +870,7 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 		DBG_WN_LN(DBG_TXT_BYE_BYE)
 
 	def tradex_register_cb(self):
-		# 訂閱委託回報
-		def on_order(code, content):
-			DBG_TR_LN(DBG_TXT_ENTER)
-			DBG_IF_LN(f"(code: {code}, content: {content})")
-
-		# 訂閱改價/改量/刪單回報
-		def on_order_changed(code, content):
-			DBG_TR_LN(DBG_TXT_ENTER)
-			DBG_IF_LN(f"(code: {code}, content: {content})")
-
-		# 訂閱成交回報
-		def on_filled(code, content):
-			DBG_TR_LN(DBG_TXT_ENTER)
-			DBG_IF_LN(f"(code: {code}, content: {content})")
-
-		# 訂閱事件通知
-		def on_event(code, content):
-			DBG_TR_LN(DBG_TXT_ENTER)
-			DBG_IF_LN(f"(code: {code}, content: {content})")
-
-		self.trade_sdk.set_on_order(on_order) 
-		self.trade_sdk.set_on_order_changed(on_order_changed) 
-		self.trade_sdk.set_on_filled(on_filled)
-		self.trade_sdk.set_on_event(on_event) 
+		DBG_TR_LN(DBG_TXT_ENTER)
 
 	def tradex_create(self):
 		DBG_TR_LN(DBG_TXT_ENTER)
@@ -960,7 +878,7 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 		self.tradex_config()
 		self.credentials = self.tradex_load_credentials()
 
-		self.trade_sdk = FubonSDK()
+		self.trade_sdk = EsunSDK(self.config)
 
 
 	#**************************************************
@@ -1017,7 +935,7 @@ class tradeX9_fubon_ctx(pythonX9, threadx_ctx):
 		if ( isPYTHON(PYTHON_V3) ):
 			super().__init__(**kwargs)
 		else:
-			super(tradex_fubon_ctx, self).__init__(**kwargs)
+			super(tradex_esun_ctx, self).__init__(**kwargs)
 
 		DBG_TR_LN(DBG_TXT_ENTER)
 		self._kwargs = kwargs

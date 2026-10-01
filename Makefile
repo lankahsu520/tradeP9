@@ -1,6 +1,8 @@
 PWD=$(shell pwd)
 -include $(SDK_CONFIG_CONFIG)
 
+MY_NAME = tradeP9
+
 #** include *.mk **
 -include define.mk
 
@@ -15,16 +17,19 @@ LIBNAME_MOD =
 
 #** GITHUB_LIBS **
 GITHUB_LIBS = \
-														https://github.com/lankahsu520/pythonX9.git
+#														https://github.com/lankahsu520/pythonX9.git
 
 #** PYTHON_FILES **
 PYTHON_FILES = \
-														tradeX9-fubon123.py \
-														tradeX9-esun123.py \
-														stockx_backtesting_123.py
+														tradeP9-fubon123 \
+														tradeP9-esun123 \
+														stockx_backtesting_123
 
 DEBUG=3
 DEBUG_ARG=-d $(DEBUG)
+
+export PJ_PYTHON_VER=$(shell python -c 'import sys; print("{0[0]}.{0[1]}".format(sys.version_info))')
+export MAKE_DBG='==\> python $(PJ_PYTHON_VER) -'
 
 #********************************************************************************
 #** All **
@@ -36,25 +41,29 @@ DEBUG_ARG=-d $(DEBUG)
 all: $(PYTHON_FILES)
 
 clean:
-	$(PJ_SH_RM) export.log
+	$(PJ_SH_RM) export.log .layer_python
 	$(PJ_SH_RM) .configured
-	$(PJ_SH_RMDIR) __pycache__/ ./python/ github_libs/
-	$(PJ_SH_RM) $(PJ_NAME)/version.txt
+	$(PJ_SH_RMDIR) __pycache__/ $(MY_NAME)/__pycache__/ log/ ./python/ github_libs/
+	$(PJ_SH_RM) $(MY_NAME)/version.txt
 	@for subdir in $(CONFS_yes); do \
 		[ -d "$$subdir" ] && (make -C $$subdir $@;) || echo "skip !!! ($$subdir)"; \
 	done
 
 distclean: clean
 
-layer_python:
-	@echo '----->> $@ - $(PWD)/python'
-	@if [ ! -d "$(PWD)/python" ]; then \
-		(pip3 install --target $(PWD)/python -r requirements.txt); \
-		for libs in $(GITHUB_LIBS); do (git clone $$libs github_libs && $(PJ_SH_CP) github_libs/*.py $(PWD)/python && rm -rf github_libs); done \
-	fi
+.layer_python:
+	#@echo '$(MAKE_DBG) $@: $(PWD)/python'
+	#@if [ ! -d "$(PWD)/python" ]; then \
+	#	(pip3 install --upgrade --force-reinstall --target $(PWD)/python -r $(MY_NAME)/requirements.txt); \
+	#	for libs in $(GITHUB_LIBS); do (git clone $$libs github_libs && $(PJ_SH_CP) github_libs/*.py $(PWD)/python && rm -rf github_libs); done \
+	#fi
+	@echo '----->> $@ - pip install -r $(MY_NAME)/requirements.txt'
+	(pip install -r $(MY_NAME)/requirements.txt)
 	@echo
+	touch $@
 
-$(PYTHON_FILES): layer_python
+$(PYTHON_FILES): .layer_python
 	@echo
-	@echo '----->> run $@'
-	PYTHONPATH=$(PWD)/python ./$@ $(DEBUG_ARG)
+	@echo '$(MAKE_DBG) run: $@'
+	#PYTHONPATH=$(PWD)/python python -m $(MY_NAME).$@ $(DEBUG_ARG)
+	./$@.py $(DEBUG_ARG)
