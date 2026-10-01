@@ -34,13 +34,13 @@ from dateutil.relativedelta import relativedelta
 
 #import os, sys, errno, getopt, signal, time, io
 #from time import sleep
-from pythonX9.pythonX9 import *
-from pythonX9.threadx_api import *
+from pythonP9.pythonP9 import *
+from pythonP9.threadx_api import *
 
 TRADE_SDK_ACCOUNT_KEY = "fubon_trade_sdk:account"
 TRADE_SDK_CERT_KEY = "fubon_trade_sdk:cert"
 
-class tradeP9_fubon_ctx(pythonX9, threadx_ctx):
+class fubonp9_ctx(pythonP9, threadx_ctx):
 	QUANTITY_LOTS_UNIT = 1000
 
 	ACTION_BUY = BSAction.Buy

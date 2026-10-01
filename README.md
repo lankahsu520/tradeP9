@@ -10,7 +10,11 @@
 
 # 2. Depend on
 
-## - [pythonX9](https://github.com/lankahsu520/pythonX9)
+## - [pythonP9](https://github.com/lankahsu520/pythonP9)
+
+```bash
+$ pip install git+https://github.com/lankahsu520/pythonP9.git
+```
 
 ## - [玉山證劵交易 API](https://www.esunsec.com.tw/trading-platforms/api-trading/)
 
@@ -145,14 +149,14 @@ $ vi ~/.local/lib/python3.12/site-packages/fubon_neo/sdk.py
 
 # 5. Example or Usage
 
-## - stockx_backtesting_123.py - 利用股票的收盤價計算每月存股的報酬率
+## - backtesting_123.py - 利用股票的收盤價計算每月存股的報酬率
 
 > 先從`臺灣證券交易所/證券櫃檯買賣中心`取得歷史收盤價，計算`日日存`的報酬率
 
 > 分割計算
 >
 > ```python
-> # stockx_backtesting_api.py
+> # backtesting_api.py
 > 
 > stock_splits = [ ("0050", pd.Timestamp("2025-06-18"), 1/4) ]
 > ```
@@ -160,7 +164,7 @@ $ vi ~/.local/lib/python3.12/site-packages/fubon_neo/sdk.py
 > 短、中、長期報酬率設定
 >
 > ```python
-> # stockx_backtesting_123.py
+> # backtesting_123.py
 > 
 > argsX = {
 > 	"stock_no": stock_no
@@ -177,7 +181,7 @@ $ vi ~/.local/lib/python3.12/site-packages/fubon_neo/sdk.py
 > ```
 >
 > ```python
-> # stockx_backtesting_api.py
+> # backtesting_api.py
 > 
 > 	def parse_args(self, args):
 > 		...
@@ -187,8 +191,8 @@ $ vi ~/.local/lib/python3.12/site-packages/fubon_neo/sdk.py
 > ```
 
 ```bash
-$ ./stockx_backtesting_123.py
-Usage: ./stockx_backtesting_123.py <options...>
+$ ./backtesting_123.py
+Usage: ./backtesting_123.py <options...>
   -h, --help
   -d, --debug level
   -s, --stock Stock symbol
@@ -201,11 +205,11 @@ Usage: ./stockx_backtesting_123.py <options...>
 ```
 
 ```bash
-$ make stockx_backtesting_123
+$ make backtesting_123
 or
-$ ./stockx_backtesting_123.py -d4 -y 10 -s 0050
-[8540/140536377751360] pythonX9.py|argsX_dump:0057 - {'stock_no': '0050', 'year_ago': 10, 'delta': 5, 'buy_short': 1, 'buy_medium': 3, 'buy_long': 5, 'history_folder': './stock', 'renew': False, 'text': False, 'verbose': False}
-[8540/140536377751360] stockx_backtesting_api.py|history_load_from_csv:0329 - Found !!! (./stock/0050_history.csv), Loading ...
+$ ./backtesting_123.py -d4 -y 10 -s 0050
+[8540/140536377751360] pythonP9.py|argsX_dump:0057 - {'stock_no': '0050', 'year_ago': 10, 'delta': 5, 'buy_short': 1, 'buy_medium': 3, 'buy_long': 5, 'history_folder': './stock', 'renew': False, 'text': False, 'verbose': False}
+[8540/140536377751360] backtesting_api.py|history_load_from_csv:0329 - Found !!! (./stock/0050_history.csv), Loading ...
 [0050] (stock_last_date：2026-09-09, delta.days: 2, stock_delta_days: 5)  Completed !!!
 Day 1-Year                  3-Year                  5-Year                  Sum
     (%)    count  average   (%)    count  average   (%)    count  average   (%)
@@ -241,7 +245,7 @@ Day 1-Year                  3-Year                  5-Year                  Sum
 30  32.84  12     82.54     92.55  34     56.95     133.17 55     47.03     258.56
 31  31.9   7      83.13     92.98  21     56.82     135.08 35     46.64     259.96
 (stock_no: 0050, final_price: 109.65)
-[8540/140536377751360] stockx_backtesting_api.py|buy_return_plot_lines_on_screen:0244 - Plotting lines ...
+[8540/140536377751360] backtesting_api.py|buy_return_plot_lines_on_screen:0244 - Plotting lines ...
 
 ```
 
@@ -249,19 +253,19 @@ Day 1-Year                  3-Year                  5-Year                  Sum
 
 ![buy_return_plot_bars_on_screen](./images/buy_return_plot_bars_on_screen.png)
 
-## - esun123-sample.py - 玉山證劵模擬交易範例
+## - esun_sample.py - 玉山證劵模擬交易範例
 
 > 這是官方的交易範例
 
-## - tradeP9-esun123.py - 玉山證劵交易範例
+## - esunp9_123.py - 玉山證劵交易範例
 
 > -t : 單純測式流程，不會下單 
 
 ```bash
-$ make tradeP9-esun123
+$ make esunp9_123
 # or
-$ ./tradeP9-esun123.py
-[9870/9870] pythonX9.py|argsX_dump:0057 - {'securities_firm': 'ESun', 'config_ini': '/work/certs/esun/config.ini', 'verbose': True, 'test_only': False, 'intact_json': False}
+$ ./esunp9_123.py
+[9870/9870] pythonP9.py|argsX_dump:0057 - {'securities_firm': 'ESun', 'config_ini': '/work/certs/esun/config.ini', 'verbose': True, 'test_only': False, 'intact_json': False}
 
 --------------- ESun 主選單 ---------------
   [1] 庫存明細,
@@ -271,7 +275,7 @@ $ ./tradeP9-esun123.py
   [i] 資料切換 (Partial),
   [l] logout
 請輸入編號 [1]~[8], [q] 離開：8
-[9870/9870] tradeP9_esun_api.py|tradex_q_tradelimit:0695 - {"trade_limit": 1000000, "margin_limit": 0, "short_limit": 0, "day_trade_code": "X", "margin_code": "9", "short_code": "9"}
+[9870/9870] esunp9.py|tradex_q_tradelimit:0695 - {"trade_limit": 1000000, "margin_limit": 0, "short_limit": 0, "day_trade_code": "X", "margin_code": "9", "short_code": "9"}
 
 --------------- ESun 主選單 ---------------
   [1] 庫存明細,
@@ -281,22 +285,22 @@ $ ./tradeP9-esun123.py
   [i] 資料切換 (Partial),
   [l] logout
 請輸入編號 [1]~[8], [q] 離開：q
-[9870/9871] tradeP9_esun_api.py|on_close:0848 - (close_status_code: None, close_msg: None)
-[9870/9871] tradeP9_esun_api.py|threadx_handler:0870 - Bye-Bye !!!
-[9870/9870] tradeP9-esun123.py|main:0378 - Bye-Bye !!! (app_quit_get: 1)
+[9870/9871] esunp9.py|on_close:0848 - (close_status_code: None, close_msg: None)
+[9870/9871] esunp9.py|threadx_handler:0870 - Bye-Bye !!!
+[9870/9870] esunp9_123.py|main:0378 - Bye-Bye !!! (app_quit_get: 1)
 ```
 
-## - tradex-fubon123.py - 富邦證劵交易範例
+## - fubonp9_123.py - 富邦證劵交易範例
 
 > -t : 單純測式流程，不會下單 
 
 ```bash
-$ make tradeP9-fubon123
+$ make fubonp9_123
 # or
-$ ./tradeP9-fubon123.py
-[9877/9877] pythonX9.py|argsX_dump:0057 - {'securities_firm': 'Fubon', 'config_ini': '/work/certs/fubon/config.ini', 'verbose': True, 'test_only': False, 'intact_json': False}
-[9877/9884] tradeP9_fubon_api.py|on_event:0950 - (code: 100, content: connected)
-[9877/9884] tradeP9_fubon_api.py|on_event:0950 - (code: 200, content: logged in)
+$ ./fubonp9_123.py
+[9877/9877] pythonP9.py|argsX_dump:0057 - {'securities_firm': 'Fubon', 'config_ini': '/work/certs/fubon/config.ini', 'verbose': True, 'test_only': False, 'intact_json': False}
+[9877/9884] fubon9.py|on_event:0950 - (code: 100, content: connected)
+[9877/9884] fubon9.py|on_event:0950 - (code: 200, content: logged in)
 
 --------------- Fubon 主選單 ---------------
   [1] 庫存明細,
@@ -306,7 +310,7 @@ $ ./tradeP9-fubon123.py
   [i] 資料切換 (Partial),
   [l] logout
 請輸入編號 [1]~[8], [q] 離開：8
-[9877/9877] tradeP9_fubon_api.py|tradex_q_tradelimit:0727 - (tradelimit: 未提供相關 API !!!)
+[9877/9877] fubon9.py|tradex_q_tradelimit:0727 - (tradelimit: 未提供相關 API !!!)
 
 --------------- Fubon 主選單 ---------------
   [1] 庫存明細,
@@ -316,8 +320,8 @@ $ ./tradeP9-fubon123.py
   [i] 資料切換 (Partial),
   [l] logout
 請輸入編號 [1]~[8], [q] 離開：q
-[9877/9885] tradeP9_fubon_api.py|threadx_handler:0929 - Bye-Bye !!!
-[9877/9877] tradeP9-fubon123.py|main:0378 - Bye-Bye !!! (app_quit_get: 1)
+[9877/9885] fubon9.py|threadx_handler:0929 - Bye-Bye !!!
+[9877/9877] fubonp9_123.py|main:0378 - Bye-Bye !!! (app_quit_get: 1)
 ```
 
 # 6. Documentation

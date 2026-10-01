@@ -17,13 +17,13 @@ LIBNAME_MOD =
 
 #** GITHUB_LIBS **
 GITHUB_LIBS = \
-#														https://github.com/lankahsu520/pythonX9.git
+#														https://github.com/lankahsu520/pythonP9.git
 
 #** PYTHON_FILES **
 PYTHON_FILES = \
-														tradeP9-fubon123 \
-														tradeP9-esun123 \
-														stockx_backtesting_123
+														fubonp9_123 \
+														esunp9_123 \
+														backtesting_123
 
 DEBUG=3
 DEBUG_ARG=-d $(DEBUG)

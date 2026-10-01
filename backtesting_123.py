@@ -20,7 +20,7 @@
 #import os, sys, errno, getopt, signal, time, io
 #from time import sleep
 
-from tradeP9.stockx_backtesting_api import *
+from tradeP9.backtesting_api import *
 
 stock_no = '0050'           # 股票代碼
 
@@ -53,7 +53,7 @@ def app_quit_set(mode):
 def app_start():
 	argsX_dump(argsX)
 
-	stockx_backtesting_mgr = stockx_backtesting_ctx()
+	stockx_backtesting_mgr = backtesting_ctx()
 	app_watch(stockx_backtesting_mgr)
 
 	stockx_backtesting_mgr.start( argsX )

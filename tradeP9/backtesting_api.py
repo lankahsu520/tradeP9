@@ -32,12 +32,12 @@ import numpy as np
 
 #import os, sys, errno, getopt, signal, time, io
 #from time import sleep
-from pythonX9.pythonX9 import *
-from pythonX9.threadx_api import *
+from pythonP9.pythonP9 import *
+from pythonP9.threadx_api import *
 
 stock_splits = [ ("0050", pd.Timestamp("2025-06-18"), 1/4) ]
 
-class stockx_backtesting_ctx(pythonX9):
+class backtesting_ctx(pythonP9):
 
 	def is_otc_stock(self, stock_no, year, month):
 		"""判斷股票是否是櫃買（OTC）"""
@@ -384,7 +384,7 @@ class stockx_backtesting_ctx(pythonX9):
 		if ( isPYTHON(PYTHON_V3) ):
 			super().__init__(**kwargs)
 		else:
-			super(stockx_backtesting_ctx, self).__init__(**kwargs)
+			super(backtesting_ctx, self).__init__(**kwargs)
 
 		self._kwargs = kwargs
 		self.ctx_init()
@@ -421,7 +421,7 @@ class stockx_backtesting_ctx(pythonX9):
 
 		#self.buy_prices_helper()
 
-#stockx_backtesting_mgr = stockx_backtesting_ctx("HelloStockX")
+#stockx_backtesting_mgr = backtesting_ctx("HelloStockX")
 #stockx_backtesting_mgr.start()
 #stockx_backtesting_mgr.display_on_screen()
 #stockx_backtesting_mgr.save_to_csv()
