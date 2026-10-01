@@ -201,7 +201,7 @@ Usage: ./stockx_backtesting_123.py <options...>
 ```
 
 ```bash
-$ make stockx_backtesting_123.py
+$ make stockx_backtesting_123
 or
 $ ./stockx_backtesting_123.py -d4 -y 10 -s 0050
 [8540/140536377751360] pythonX9.py|argsX_dump:0057 - {'stock_no': '0050', 'year_ago': 10, 'delta': 5, 'buy_short': 1, 'buy_medium': 3, 'buy_long': 5, 'history_folder': './stock', 'renew': False, 'text': False, 'verbose': False}
@@ -258,8 +258,8 @@ Day 1-Year                  3-Year                  5-Year                  Sum
 > -t : 單純測式流程，不會下單 
 
 ```bash
-$ make tradeP9-esun123.py
-or
+$ make tradeP9-esun123
+# or
 $ ./tradeP9-esun123.py
 [9870/9870] pythonX9.py|argsX_dump:0057 - {'securities_firm': 'ESun', 'config_ini': '/work/certs/esun/config.ini', 'verbose': True, 'test_only': False, 'intact_json': False}
 
@@ -291,7 +291,9 @@ $ ./tradeP9-esun123.py
 > -t : 單純測式流程，不會下單 
 
 ```bash
-$ ./tradex-fubon123.py
+$ make tradeP9-fubon123
+# or
+$ ./tradeP9-fubon123.py
 [9877/9877] pythonX9.py|argsX_dump:0057 - {'securities_firm': 'Fubon', 'config_ini': '/work/certs/fubon/config.ini', 'verbose': True, 'test_only': False, 'intact_json': False}
 [9877/9884] tradeP9_fubon_api.py|on_event:0950 - (code: 100, content: connected)
 [9877/9884] tradeP9_fubon_api.py|on_event:0950 - (code: 200, content: logged in)
