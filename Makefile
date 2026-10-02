@@ -17,7 +17,7 @@ LIBNAME_MOD =
 
 #** GITHUB_LIBS **
 GITHUB_LIBS = \
-#														https://github.com/lankahsu520/pythonP9.git
+#														https://github.com/lankahsu520/utilsP9.git
 
 #** PYTHON_FILES **
 PYTHON_FILES = \

@@ -9,7 +9,7 @@ description = "tradeP9 提供台灣證券的相關操作和分析。"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
-    "pythonP9 @ git+https://github.com/lankahsu520/pythonP9.git",
+    "utilsP9 @ git+https://github.com/lankahsu520/utilsP9.git",
 ]
 
 [tool.setuptools]

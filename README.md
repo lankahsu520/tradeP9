@@ -10,10 +10,10 @@
 
 # 2. Depend on
 
-## - [pythonP9](https://github.com/lankahsu520/pythonP9)
+## - [utilsP9](https://github.com/lankahsu520/utilsP9)
 
 ```bash
-$ pip install git+https://github.com/lankahsu520/pythonP9.git
+$ pip install git+https://github.com/lankahsu520/utilsP9.git
 ```
 
 ## - [玉山證劵交易 API](https://www.esunsec.com.tw/trading-platforms/api-trading/)
@@ -208,7 +208,7 @@ Usage: ./backtesting_123.py <options...>
 $ make backtesting_123
 or
 $ ./backtesting_123.py -d4 -y 10 -s 0050
-[8540/140536377751360] pythonP9.py|argsX_dump:0057 - {'stock_no': '0050', 'year_ago': 10, 'delta': 5, 'buy_short': 1, 'buy_medium': 3, 'buy_long': 5, 'history_folder': './stock', 'renew': False, 'text': False, 'verbose': False}
+[8540/140536377751360] utilsP9.py|argsX_dump:0057 - {'stock_no': '0050', 'year_ago': 10, 'delta': 5, 'buy_short': 1, 'buy_medium': 3, 'buy_long': 5, 'history_folder': './stock', 'renew': False, 'text': False, 'verbose': False}
 [8540/140536377751360] backtesting_api.py|history_load_from_csv:0329 - Found !!! (./stock/0050_history.csv), Loading ...
 [0050] (stock_last_date：2026-09-09, delta.days: 2, stock_delta_days: 5)  Completed !!!
 Day 1-Year                  3-Year                  5-Year                  Sum
@@ -265,7 +265,7 @@ Day 1-Year                  3-Year                  5-Year                  Sum
 $ make esunp9_123
 # or
 $ ./esunp9_123.py
-[9870/9870] pythonP9.py|argsX_dump:0057 - {'securities_firm': 'ESun', 'config_ini': '/work/certs/esun/config.ini', 'verbose': True, 'test_only': False, 'intact_json': False}
+[9870/9870] utilsP9.py|argsX_dump:0057 - {'securities_firm': 'ESun', 'config_ini': '/work/certs/esun/config.ini', 'verbose': True, 'test_only': False, 'intact_json': False}
 
 --------------- ESun 主選單 ---------------
   [1] 庫存明細,
@@ -298,7 +298,7 @@ $ ./esunp9_123.py
 $ make fubonp9_123
 # or
 $ ./fubonp9_123.py
-[12585/12585] pythonP9.py|argsX_dump:0057 - {'securities_firm': 'Fubon', 'config_ini': '/work/certs/fubon/config.ini', 'verbose': True, 'test_only': False, 'intact_json': False}
+[12585/12585] utilsP9.py|argsX_dump:0057 - {'securities_firm': 'Fubon', 'config_ini': '/work/certs/fubon/config.ini', 'verbose': True, 'test_only': False, 'intact_json': False}
 [12585/12591] fubonp9.py|on_event:0950 - (code: 100, content: connected)
 [12585/12591] fubonp9.py|on_event:0950 - (code: 200, content: logged in)
 

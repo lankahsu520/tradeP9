@@ -28,10 +28,10 @@ from datetime import date, timedelta
 
 #import os, sys, errno, getopt, signal, time, io
 #from time import sleep
-from pythonP9.pythonP9 import *
-from pythonP9.threadx_api import *
+from utilsP9.utilsP9 import *
+from utilsP9.threadx_api import *
 
-class esunp9_ctx(pythonP9, threadx_ctx):
+class esunp9_ctx(utilsP9, threadx_ctx):
 	QUANTITY_LOTS_UNIT = 1
 
 	ACTION_BUY = Action.Buy

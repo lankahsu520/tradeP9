@@ -32,12 +32,12 @@ import numpy as np
 
 #import os, sys, errno, getopt, signal, time, io
 #from time import sleep
-from pythonP9.pythonP9 import *
-from pythonP9.threadx_api import *
+from utilsP9.utilsP9 import *
+from utilsP9.threadx_api import *
 
 stock_splits = [ ("0050", pd.Timestamp("2025-06-18"), 1/4) ]
 
-class backtesting_ctx(pythonP9):
+class backtesting_ctx(utilsP9):
 
 	def is_otc_stock(self, stock_no, year, month):
 		"""判斷股票是否是櫃買（OTC）"""
