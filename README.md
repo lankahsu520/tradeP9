@@ -326,6 +326,22 @@ $ ./fubonp9_123.py
 
 # 6. Documentation
 
+> 以下是相關的繼承關係圖
+
+```mermaid
+flowchart LR
+	object --> utilsP9_ctx
+		utilsP9_ctx --> backtesting_ctx
+
+		utilsP9_ctx --> esunp9_ctx
+		utilsP9_ctx --> fubonp9_ctx
+
+	object --> threadx_ctx
+		threadx_ctx --> esunp9_ctx
+		threadx_ctx --> fubonp9_ctx
+
+```
+
 ## 6.1. 帳號
 
 ```bash

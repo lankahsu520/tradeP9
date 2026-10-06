@@ -20,7 +20,7 @@
 #import os, sys, errno, getopt, signal, time, io
 #from time import sleep
 
-from tradeP9.fubonp9 import *
+from tradeP9.fubonp9_api import *
 
 appX_list = []
 is_quit = 0
