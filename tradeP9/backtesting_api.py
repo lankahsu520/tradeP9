@@ -35,7 +35,15 @@ import numpy as np
 from utilsP9.utilsP9_api import *
 from utilsP9.threadx_api import *
 
-stock_splits = [ ("0050", pd.Timestamp("2025-06-18"), 1/4) ]
+stock_splits = [
+	("0050", pd.Timestamp("2025-06-18"), 1/4)
+	,("00663L", pd.Timestamp("2025-06-11"), 1/7)
+	,("0052", pd.Timestamp("2025-11-26"), 1/7)
+	,("00631L", pd.Timestamp("2026-03-31"), 1/22)
+	,("00685L", pd.Timestamp("2026-07-07"), 1/24)
+	,("00662", pd.Timestamp("2026-11-17"), 1/5)
+	,("0053", pd.Timestamp("2026-12-08"), 1/8)
+]
 
 class backtesting_ctx(utilsP9_ctx):
 
