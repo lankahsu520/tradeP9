@@ -36,8 +36,12 @@ from utilsP9.utilsP9_api import *
 from utilsP9.threadx_api import *
 
 stock_splits = [
-	("0050", pd.Timestamp("2025-06-18"), 1/4)
+	("5314", pd.Timestamp("2025-03-31"), 1/20)
+	,("0050", pd.Timestamp("2025-06-18"), 1/4)
 	,("00663L", pd.Timestamp("2025-06-11"), 1/7)
+	,("6919", pd.Timestamp("2025-07-21"), 1/10)
+	,("2327", pd.Timestamp("2025-08-25"), 1/4)
+	,("8422", pd.Timestamp("2025-11-17"), 1/10)
 	,("0052", pd.Timestamp("2025-11-26"), 1/7)
 	,("00631L", pd.Timestamp("2026-03-31"), 1/22)
 	,("00685L", pd.Timestamp("2026-07-07"), 1/24)
